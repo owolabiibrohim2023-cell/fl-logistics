@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Dashboard — FL Logistics</title>
+<meta name="description" content="View your FL Logistics orders, track deliveries, reorder, manage saved addresses and update your profile.">
+<meta name="theme-color" content="#0B3D91">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230B3D91'/><text x='50' y='66' font-size='44' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>FL</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="siteHeader"></div>
+
+<main>
+<section class="section" style="background:var(--bg)"><div class="container" style="max-width:980px">
+
+  <!-- Loading state -->
+  <div id="accountLoading" class="card">
+    <div class="skeleton" style="width:45%"></div>
+    <div class="skeleton" style="width:75%;margin-top:14px"></div>
+    <div class="skeleton" style="width:60%;margin-top:14px"></div>
+    <p class="muted small" style="margin-top:16px">Loading your dashboard…</p>
+  </div>
+
+  <div id="accountApp" class="hidden">
+    <div class="alert alert-success" id="welcomeAlert"></div>
+
+    <div class="alert alert-info" id="verifyAlert">
+      <b>Verify your email address.</b>
+      <span>Your account works, but verification helps secure it and improves email-alert delivery.</span>
+      <div style="margin-top:10px">
+        <button type="button" class="btn btn-blue btn-sm" id="resendVerifyBtn">
+          <i class="fa-solid fa-envelope"></i> Resend verification email
+        </button>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div class="card" style="margin-bottom:18px">
+      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+        <div id="avatar" style="width:64px;height:64px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:1.45rem;font-weight:800;flex:none">FL</div>
+        <div style="flex:1;min-width:220px">
+          <h1 style="font-size:1.55rem" id="welcomeTitle">Welcome back</h1>
+          <p class="muted" id="accountMeta">—</p>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn-orange" href="book.html"><i class="fa-solid fa-box"></i> Book a new delivery</a>
+          <button type="button" class="btn btn-outline" id="logoutBtnTop">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick stats -->
+    <div class="grid grid-3" style="margin-bottom:22px">
+      <div class="stat-card">
+        <div class="n" id="statActive">0</div>
+        <div class="l"><i class="fa-solid fa-truck-fast" style="color:var(--orange)"></i> Active orders</div>
+      </div>
+      <div class="stat-card">
+        <div class="n" id="statDelivered">0</div>
+        <div class="l"><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> Delivered orders</div>
+      </div>
+      <div class="stat-card">
+        <div class="n" id="statTotal">0</div>
+        <div class="l"><i class="fa-solid fa-boxes-stacked" style="color:var(--blue)"></i> Total orders</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs" role="tablist" aria-label="Account sections">
+      <button type="button" class="tab-btn active" data-tab="orders" role="tab">
+        <i class="fa-solid fa-box-open"></i> My Orders
+      </button>
+      <button type="button" class="tab-btn" data-tab="addresses" role="tab">
+        <i class="fa-solid fa-address-book"></i> Saved Addresses
+      </button>
+      <button type="button" class="tab-btn" data-tab="profile" role="tab">
+        <i class="fa-solid fa-user-gear"></i> Profile Settings
+      </button>
+    </div>
+
+    <!-- ORDERS PANEL -->
+    <section id="panel-orders">
+      <div id="ordersLoading" class="card">
+        <div class="skeleton" style="width:55%"></div>
+        <div class="skeleton" style="width:85%;margin-top:12px"></div>
+        <div class="skeleton" style="width:70%;margin-top:12px"></div>
+      </div>
+
+      <div id="ordersEmpty" class="card text-center hidden" style="padding:36px 22px">
+        <div style="font-size:2.5rem;color:var(--orange)"><i class="fa-solid fa-box-open"></i></div>
+        <h2 style="margin-top:10px">No orders yet</h2>
+        <p class="muted" style="max-width:480px;margin:6px auto 18px">
+          When you book while signed in, your deliveries will appear here automatically and update in real time.
+        </p>
+        <a href="book.html" class="btn btn-orange"><i class="fa-solid fa-box"></i> Book your first delivery</a>
+      </div>
+
+      <div id="ordersList"></div>
+    </section>
+
+    <!-- ADDRESSES PANEL -->
+    <section id="panel-addresses" class="hidden">
+      <div class="form-card" style="margin-bottom:18px">
+        <h2 id="addressFormTitle" style="font-size:1.25rem">Add a saved address</h2>
+        <p class="muted small" style="margin-bottom:16px">
+          Saved addresses appear in the booking form so you don't have to type them again.
+        </p>
+
+        <form id="addressForm" novalidate>
+          <input type="hidden" id="addressId">
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="addressLabel">Label <span class="req">*</span></label>
+              <input id="addressLabel" placeholder="e.g. Home, Shop, Office, Customer">
+              <p class="field-error"></p>
+            </div>
+
+            <div class="field">
+              <label for="addressPhone">Contact phone <span class="muted">(optional)</span></label>
+              <input id="addressPhone" type="tel" inputmode="tel" placeholder="Phone for this address">
+              <p class="field-error"></p>
+            </div>
+
+            <div class="field span-2">
+              <label for="addressText">Full address <span class="req">*</span></label>
+              <textarea id="addressText" placeholder="House/flat, street, area, nearest bus stop, city/state"></textarea>
+              <p class="field-error"></p>
+            </div>
+          </div>
+
+          <div class="check-row">
+            <input type="checkbox" id="addressDefault">
+            <label for="addressDefault">Set as my default pickup address</label>
+          </div>
+
+          <div class="btn-row" style="margin-top:12px">
+            <button type="submit" class="btn btn-blue" id="addressSaveBtn">
+              <i class="fa-solid fa-floppy-disk"></i> Save address
+            </button>
+            <button type="button" class="btn btn-ghost hidden" id="addressCancelBtn">Cancel editing</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="addressEmpty" class="card text-center hidden" style="padding:32px 20px">
+        <div style="font-size:2.2rem;color:var(--blue)"><i class="fa-solid fa-address-book"></i></div>
+        <h3 style="margin-top:8px">No saved addresses yet</h3>
+        <p class="muted">Add your home, shop or frequent customer addresses above.</p>
+      </div>
+
+      <div id="addressList" class="grid grid-2"></div>
+    </section>
+
+    <!-- PROFILE PANEL -->
+    <section id="panel-profile" class="hidden">
+      <form class="form-card" id="profileForm" novalidate style="margin-bottom:18px">
+        <h2 style="font-size:1.3rem">Profile settings</h2>
+        <p class="muted small" style="margin-bottom:18px">
+          These details prefill your booking form and control where your alerts are sent.
+        </p>
+
+        <div class="alert alert-error" id="profileError"></div>
+        <div class="alert alert-success" id="profileSuccess"></div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="profileName">Full name <span class="req">*</span></label>
+            <input id="profileName" autocomplete="name">
+            <p class="field-error"></p>
+          </div>
+
+          <div class="field">
+            <label for="profilePhone">Phone number <span class="req">*</span></label>
+            <input id="profilePhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="0813 740 7197 or +234…">
+            <p class="field-error"></p>
+          </div>
+
+          <div class="field">
+            <label for="profileEmail">Email address</label>
+            <input id="profileEmail" disabled>
+            <p class="small muted">Email is your sign-in ID and can't be changed here.</p>
+          </div>
+
+          <div class="field">
+            <label for="profileAccountType">Account type</label>
+            <select id="profileAccountType">
+              <option>Individual</option>
+              <option>Business</option>
+            </select>
+            <p class="field-error"></p>
+          </div>
+
+          <div class="field hidden" id="profileBizWrap">
+            <label for="profileBusinessName">Business name <span class="req">*</span></label>
+            <input id="profileBusinessName" autocomplete="organization">
+            <p class="field-error"></p>
+          </div>
+
+          <div class="field">
+            <label for="profileArea">City / area in Lagos</label>
+            <input id="profileArea" placeholder="e.g. Ogba, Ikeja, Lekki">
+            <p class="field-error"></p>
+          </div>
+
+          <div class="field span-2">
+            <label for="profileDefaultAddress">Default pickup address</label>
+            <textarea id="profileDefaultAddress" placeholder="Your normal pickup address"></textarea>
+            <p class="field-error"></p>
+          </div>
+        </div>
+
+        <fieldset>
+          <legend><i class="fa-solid fa-bell"></i> Notification preferences</legend>
+          <div class="check-row">
+            <input type="checkbox" id="profilePrefEmail">
+            <label for="profilePrefEmail">Email alerts</label>
+          </div>
+          <div class="check-row">
+            <input type="checkbox" id="profilePrefSms">
+            <label for="profilePrefSms">SMS alerts</label>
+          </div>
+          <div class="check-row">
+            <input type="checkbox" id="profilePrefWhatsapp">
+            <label for="profilePrefWhatsapp">WhatsApp updates</label>
+          </div>
+        </fieldset>
+
+        <button type="submit" class="btn btn-blue" id="profileSaveBtn">
+          <i class="fa-solid fa-floppy-disk"></i> Save profile changes
+        </button>
+      </form>
+
+      <!-- Change password: only for email/password accounts -->
+      <form class="form-card hidden" id="passwordForm" novalidate style="margin-bottom:18px">
+        <h2 style="font-size:1.3rem">Change password</h2>
+        <p class="muted small" style="margin-bottom:18px">Use at least 8 characters.</p>
+
+        <div class="form-grid">
+          <div class="field span-2">
+            <label for="currentPassword">Current password <span class="req">*</span></label>
+            <div class="pw-wrap">
+              <input id="currentPassword" type="password" autocomplete="current-password">
+              <button type="button" class="pw-toggle" data-target="currentPassword">Show</button>
+            </div>
+            <p class="field-error"></p>
+          </div>
+
+          <div class="field">
+            <label for="newPassword">New password <span class="req">*</span></label>
+            <div class="pw-wrap">
+              <input id="newPassword" type="password" autocomplete="new-password">
+              <button type="button" class="pw-toggle" data-target="newPassword">Show</button>
+            </div>
+            <div class="pw-strength"><i id="newPwBar"></i></div>
+            <p class="small muted" id="newPwLabel" style="margin-top:6px"></p>
+            <p class="field-error"></p>
+          </div>
+
+          <div class="field">
+            <label for="confirmNewPassword">Confirm new password <span class="req">*</span></label>
+            <div class="pw-wrap">
+              <input id="confirmNewPassword" type="password" autocomplete="new-password">
+              <button type="button" class="pw-toggle" data-target="confirmNewPassword">Show</button>
+            </div>
+            <p class="field-error"></p>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-outline" id="passwordSaveBtn">
+          <i class="fa-solid fa-key"></i> Update password
+        </button>
+      </form>
+
+      <!-- Danger zone -->
+      <div class="card" style="border-color:#f0b7ae;background:#fff8f7">
+        <h2 style="font-size:1.25rem;color:var(--red)"><i class="fa-solid fa-triangle-exclamation"></i> Danger zone</h2>
+        <p class="muted" style="margin:8px 0 14px">
+          Deleting your account removes your profile and saved addresses and signs you out permanently.
+          Past delivery records may be kept by FL Logistics for business/payment records.
+        </p>
+
+        <div class="field hidden" id="deletePasswordWrap">
+          <label for="deletePassword">Enter your current password to delete</label>
+          <div class="pw-wrap">
+            <input id="deletePassword" type="password" autocomplete="current-password">
+            <button type="button" class="pw-toggle" data-target="deletePassword">Show</button>
+          </div>
+          <p class="field-error"></p>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn btn-danger" id="deleteAccountBtn">
+            <i class="fa-solid fa-user-xmark"></i> Delete my account
+          </button>
+          <button type="button" class="btn btn-outline" id="logoutBtnBottom">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</div></section>
+</main>
+
+<div id="siteFooter"></div>
+
+<script type="module">
+import {
+  CONFIG, renderChrome, $, $$, esc, toast, confirmDialog,
+  db, fmtMoney, fmtDateTime, waLink, setFieldError,
+  isValidNgPhone, normalizeNgPhone
+} from "./app.js";
+import {
+  watchAuth,
+  signOutUser,
+  resendVerification,
+  changeUserPassword,
+  deleteUserAccount,
+  friendlyAuthError,
+  getPasswordStrength,
+  setupPasswordToggles,
+  hasPasswordProvider
+} from "./auth.js";
+import {
+  doc, updateDoc, collection, query, where, onSnapshot,
+  addDoc, deleteDoc, writeBatch, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+renderChrome("account.html");
+setupPasswordToggles();
+
+let currentUser = null;
+let currentProfile = null;
+let listenersStarted = false;
+let profileFilled = false;
+let ordersById = {};
+let addressesById = {};
+
+/* ---------------- Tabs ---------------- */
+function activateTab(name, updateHash = true) {
+  const valid = ["orders", "addresses", "profile"].includes(name) ? name : "orders";
+
+  $$(".tab-btn").forEach(btn =>
+    btn.classList.toggle("active", btn.dataset.tab === valid)
+  );
+
+  ["orders", "addresses", "profile"].forEach(panel =>
+    $("#panel-" + panel).classList.toggle("hidden", panel !== valid)
+  );
+
+  if (updateHash) history.replaceState(null, "", "#" + valid);
+}
+
+$$(".tab-btn").forEach(btn =>
+  btn.addEventListener("click", () => activateTab(btn.dataset.tab))
+);
+
+addEventListener("hashchange", () =>
+  activateTab(location.hash.replace("#", ""), false)
+);
+
+/* ---------------- Auth guard ---------------- */
+watchAuth(async (user, profile) => {
+  if (!user) {
+    location.href = "login.html?next=account.html";
+    return;
+  }
+
+  if (profile?.role === "admin") {
+    location.href = "admin.html";
+    return;
+  }
+
+  if (profile?.role === "rider") {
+    location.href = "rider.html";
+    return;
+  }
+
+  if (profile?.disabled) {
+    await signOutUser();
+    location.href = "login.html";
+    return;
+  }
+
+  currentUser = user;
+  currentProfile = profile || {};
+
+  $("#accountLoading").classList.add("hidden");
+  $("#accountApp").classList.remove("hidden");
+
+  fillHeader(user, currentProfile);
+  if (!profileFilled) fillProfileForm(user, currentProfile);
+
+  const showVerify =
+    hasPasswordProvider(user) && !user.emailVerified;
+  $("#verifyAlert").classList.toggle("show", showVerify);
+
+  $("#passwordForm").classList.toggle(
+    "hidden",
+    !hasPasswordProvider(user)
+  );
+  $("#deletePasswordWrap").classList.toggle(
+    "hidden",
+    !hasPasswordProvider(user)
+  );
+
+  if (new URLSearchParams(location.search).get("welcome") === "1") {
+    const name = currentProfile.fullName || user.displayName || "there";
+    const el = $("#welcomeAlert");
+    el.innerHTML = `
+      <b>Welcome to FL Logistics, ${esc(String(name).split(" ")[0])}!</b>
+      Your dashboard is ready. Book a delivery, save your addresses and track everything here.`;
+    el.classList.add("show");
+  }
+
+  activateTab(location.hash.replace("#", "") || "orders", false);
+
+  if (!listenersStarted && db) {
+    listenersStarted = true;
+    listenToOrders(user.uid);
+    listenToAddresses(user.uid);
+  }
+});
+
+function initials(name = "") {
+  return String(name)
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(x => x[0].toUpperCase())
+    .join("") || "FL";
+}
+
+function fillHeader(user, profile) {
+  const name = profile.fullName || user.displayName || user.email || "Customer";
+  $("#avatar").textContent = initials(name);
+  $("#welcomeTitle").textContent = `Hello, ${String(name).split(" ")[0]} 👋`;
+
+  const bits = [
+    profile.accountType || "Individual",
+    profile.businessName || "",
+    user.email || "",
+    profile.createdAt ? `Member since ${fmtDateTime(profile.createdAt)}` : ""
+  ].filter(Boolean);
+
+  $("#accountMeta").textContent = bits.join(" · ");
+}
+
+/* ---------------- Real-time My Orders ---------------- */
+function statusBadgeClass(status) {
+  if (status === "Delivered") return "badge-green";
+  if (status === "Cancelled") return "badge-red";
+  if (status === "Out for Delivery" || status === "In Transit") return "badge-orange";
+  if (status === "Confirmed" || status === "Picked Up") return "badge-blue";
+  return "badge-amber";
+}
+
+function orderMillis(order) {
+  if (order.createdAt?.toMillis) return order.createdAt.toMillis();
+  if (order.createdAt?.seconds) return order.createdAt.seconds * 1000;
+  return 0;
+}
+
+function listenToOrders(uid) {
+  /*
+    where() only + client-side sorting:
+    this avoids needing a custom composite Firestore index.
+  */
+  const q = query(collection(db, "orders"), where("customerUid", "==", uid));
+
+  onSnapshot(q, snap => {
+    const orders = [];
+    snap.forEach(d => orders.push({ orderId: d.id, ...d.data() }));
+    orders.sort((a, b) => orderMillis(b) - orderMillis(a));
+
+    ordersById = {};
+    orders.forEach(o => (ordersById[o.orderId] = o));
+
+    const active = orders.filter(
+      o => !["Delivered", "Cancelled"].includes(o.status)
+    ).length;
+    const delivered = orders.filter(o => o.status === "Delivered").length;
+
+    $("#statActive").textContent = active;
+    $("#statDelivered").textContent = delivered;
+    $("#statTotal").textContent = orders.length;
+
+    $("#ordersLoading").classList.add("hidden");
+    $("#ordersEmpty").classList.toggle("hidden", orders.length > 0);
+    $("#ordersList").innerHTML = orders.map(orderCardHtml).join("");
+
+    bindOrderButtons();
+  }, err => {
+    console.error(err);
+    $("#ordersLoading").innerHTML = `
+      <h3>Couldn't load your orders</h3>
+      <p class="muted">Please check your network connection and refresh this page.</p>`;
+  });
+}
+
+function shortAddress(address = "") {
+  const text = String(address).trim();
+  return text.length > 90 ? text.slice(0, 90) + "…" : text;
+}
+
+function orderCardHtml(o) {
+  const price =
+    o.finalPrice != null
+      ? `${fmtMoney(o.finalPrice)} confirmed`
+      : `${fmtMoney(o.estimatedPrice)} estimate`;
+
+  const payClass =
+    o.paymentStatus === "Paid"
+      ? "badge-green"
+      : o.paymentStatus === "COD"
+        ? "badge-orange"
+        : "badge-amber";
+
+  const extraStops = Math.max(0, (o.stops?.length || 1) - 1);
+
+  return `
+  <article class="order-row">
+    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start">
+      <div>
+        <div style="font-weight:800;color:var(--blue-dark);font-size:1.08rem">${esc(o.orderId)}</div>
+        <div class="small muted">${fmtDateTime(o.createdAt)} · ${esc(o.serviceType || "Delivery")}</div>
+      </div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap">
+        <span class="badge ${statusBadgeClass(o.status)}">${esc(o.status || "Order Placed")}</span>
+        <span class="badge ${payClass}">Payment: ${esc(o.paymentStatus || "Pending")}</span>
+      </div>
+    </div>
+
+    <div style="margin:14px 0;display:grid;gap:8px">
+      <p class="small">
+        <i class="fa-solid fa-circle-dot" style="color:var(--blue)"></i>
+        <b>Pickup:</b> ${esc(shortAddress(o.pickupAddress))}
+      </p>
+      <p class="small">
+        <i class="fa-solid fa-location-dot" style="color:var(--green)"></i>
+        <b>Drop-off:</b> ${esc(shortAddress(o.dropoffAddress))}
+        ${extraStops ? `<span class="badge badge-blue">+${extraStops} extra</span>` : ""}
+      </p>
+      <p class="small muted">
+        <i class="fa-solid fa-box"></i>
+        ${esc(o.packageType || "Package")}
+        ${o.packageDescription ? "— " + esc(o.packageDescription) : ""}
+        (${esc(o.weightKg || 1)}kg)
+        · <b>${esc(price)}</b>
+      </p>
+      ${o.riderName ? `
+        <p class="small">
+          <i class="fa-solid fa-motorcycle" style="color:var(--orange)"></i>
+          Rider: <b>${esc(o.riderName)}</b>
+          ${o.riderPhone ? `· <a href="tel:${esc(normalizeNgPhone(o.riderPhone))}">${esc(o.riderPhone)}</a>` : ""}
+        </p>` : ""}
+    </div>
+
+    <div class="btn-row">
+      <a class="btn btn-blue btn-sm" href="track.html?id=${encodeURIComponent(o.orderId)}">
+        <i class="fa-solid fa-location-crosshairs"></i> Track
+      </a>
+      <button type="button" class="btn btn-ghost btn-sm" data-reorder="${esc(o.orderId)}">
+        <i class="fa-solid fa-rotate-right"></i> Reorder / Repeat this delivery
+      </button>
+      <a class="btn btn-wa btn-sm" target="_blank" rel="noopener"
+         href="${waLink(`Hello FL Logistics, I need help with my order ${o.orderId}.`)}">
+        <i class="fa-brands fa-whatsapp"></i> Help
+      </a>
+    </div>
+  </article>`;
+}
+
+function bindOrderButtons() {
+  $$("[data-reorder]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const o = ordersById[btn.dataset.reorder];
+      if (!o) return;
+
+      const reorderData = {
+        senderName: o.senderName || "",
+        senderPhone: o.senderPhone || "",
+        senderEmail: o.senderEmail || o.customerEmail || "",
+        pickupAddress: o.pickupAddress || "",
+        receiverName: o.receiverName || "",
+        receiverPhone: o.receiverPhone || "",
+        receiverEmail: o.receiverEmail || "",
+        dropoffAddress: o.dropoffAddress || "",
+        packageType: o.packageType || "",
+        packageDescription: o.packageDescription || "",
+        weightKg: o.weightKg || 1,
+        serviceType: o.serviceType || "",
+        zone: o.zone || "",
+        instructions: o.instructions || ""
+      };
+
+      sessionStorage.setItem("fl_reorder", JSON.stringify(reorderData));
+      location.href = "book.html";
+    });
+  });
+}
+
+/* ---------------- Saved addresses ---------------- */
+function listenToAddresses(uid) {
+  onSnapshot(collection(db, "users", uid, "addresses"), snap => {
+    const addresses = [];
+    snap.forEach(d => addresses.push({ id: d.id, ...d.data() }));
+
+    addresses.sort((a, b) =>
+      Number(!!b.isDefault) - Number(!!a.isDefault) ||
+      String(a.label || "").localeCompare(String(b.label || ""))
+    );
+
+    addressesById = {};
+    addresses.forEach(a => (addressesById[a.id] = a));
+
+    $("#addressEmpty").classList.toggle("hidden", addresses.length > 0);
+    $("#addressList").innerHTML = addresses.map(addressCardHtml).join("");
+    bindAddressButtons(uid);
+  }, err => {
+    console.error(err);
+    toast("Couldn't load saved addresses. Please refresh.", "error");
+  });
+}
+
+function addressCardHtml(a) {
+  return `
+  <article class="card">
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
+      <h3><i class="fa-solid fa-location-dot" style="color:var(--orange)"></i> ${esc(a.label || "Saved address")}</h3>
+      ${a.isDefault ? `<span class="badge badge-green">Default pickup</span>` : ""}
+    </div>
+    <p class="muted" style="margin:10px 0">${esc(a.address || "")}</p>
+    ${a.phone ? `<p class="small"><i class="fa-solid fa-phone"></i> ${esc(a.phone)}</p>` : ""}
+    <div class="btn-row" style="margin-top:14px">
+      ${a.isDefault ? "" : `
+        <button type="button" class="btn btn-ghost btn-sm" data-default-address="${esc(a.id)}">
+          Set default
+        </button>`}
+      <button type="button" class="btn btn-outline btn-sm" data-edit-address="${esc(a.id)}">
+        <i class="fa-solid fa-pen"></i> Edit
+      </button>
+      <button type="button" class="btn btn-danger btn-sm" data-delete-address="${esc(a.id)}">
+        <i class="fa-solid fa-trash"></i> Delete
+      </button>
+    </div>
+  </article>`;
+}
+
+async function setDefaultAddress(uid, addressId, addressText) {
+  const batch = writeBatch(db);
+
+  Object.values(addressesById).forEach(a => {
+    batch.update(doc(db, "users", uid, "addresses", a.id), {
+      isDefault: a.id === addressId,
+      updatedAt: serverTimestamp()
+    });
+  });
+
+  batch.update(doc(db, "users", uid), {
+    defaultAddress: addressText,
+    updatedAt: serverTimestamp()
+  });
+
+  await batch.commit();
+
+  currentProfile.defaultAddress = addressText;
+  $("#profileDefaultAddress").value = addressText;
+}
+
+function resetAddressForm() {
+  $("#addressForm").reset();
+  $("#addressId").value = "";
+  $("#addressFormTitle").textContent = "Add a saved address";
+  $("#addressSaveBtn").innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Save address`;
+  $("#addressCancelBtn").classList.add("hidden");
+}
+
+function bindAddressButtons(uid) {
+  $$("[data-edit-address]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const a = addressesById[btn.dataset.editAddress];
+      if (!a) return;
+
+      $("#addressId").value = a.id;
+      $("#addressLabel").value = a.label || "";
+      $("#addressPhone").value = a.phone || "";
+      $("#addressText").value = a.address || "";
+      $("#addressDefault").checked = !!a.isDefault;
+      $("#addressFormTitle").textContent = "Edit saved address";
+      $("#addressSaveBtn").innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Save changes`;
+      $("#addressCancelBtn").classList.remove("hidden");
+      $("#addressForm").scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  });
+
+  $$("[data-default-address]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const a = addressesById[btn.dataset.defaultAddress];
+      if (!a) return;
+
+      try {
+        await setDefaultAddress(uid, a.id, a.address);
+        toast("Default pickup address updated.", "success");
+      } catch (err) {
+        console.error(err);
+        toast("Couldn't set the default address. Please try again.", "error");
+      }
+    });
+  });
+
+  $$("[data-delete-address]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const a = addressesById[btn.dataset.deleteAddress];
+      if (!a) return;
+
+      const yes = await confirmDialog(
+        "Delete this address?",
+        `"${a.label || "This address"}" will be removed from your saved addresses.`,
+        "Yes, delete"
+      );
+      if (!yes) return;
+
+      try {
+        await deleteDoc(doc(db, "users", uid, "addresses", a.id));
+
+        if (a.isDefault) {
+          await updateDoc(doc(db, "users", uid), {
+            defaultAddress: "",
+            updatedAt: serverTimestamp()
+          });
+          currentProfile.defaultAddress = "";
+          $("#profileDefaultAddress").value = "";
+        }
+
+        if ($("#addressId").value === a.id) resetAddressForm();
+        toast("Address deleted.", "success");
+      } catch (err) {
+        console.error(err);
+        toast("Couldn't delete the address. Please try again.", "error");
+      }
+    });
+  });
+}
+
+$("#addressCancelBtn").addEventListener("click", resetAddressForm);
+
+$("#addressForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (!currentUser || !db) return;
+
+  const label = $("#addressLabel").value.trim();
+  const phone = $("#addressPhone").value.trim();
+  const address = $("#addressText").value.trim();
+  const makeDefault = $("#addressDefault").checked;
+  const editingId = $("#addressId").value;
+
+  let ok = true;
+  if (label.length < 2) {
+    setFieldError($("#addressLabel"), "Give this address a short label, e.g. Home or Shop.");
+    ok = false;
+  } else setFieldError($("#addressLabel"), "");
+
+  if (address.length < 8) {
+    setFieldError($("#addressText"), "Please enter the full address with a nearby landmark.");
+    ok = false;
+  } else setFieldError($("#addressText"), "");
+
+  if (phone && !isValidNgPhone(phone)) {
+    setFieldError($("#addressPhone"), "Enter a valid Nigerian number, or leave this blank.");
+    ok = false;
+  } else setFieldError($("#addressPhone"), "");
+
+  if (!ok) return;
+
+  const btn = $("#addressSaveBtn");
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span> Saving…`;
+
+  try {
+    let addressId = editingId;
+
+    if (editingId) {
+      await updateDoc(doc(db, "users", currentUser.uid, "addresses", editingId), {
+        label,
+        phone,
+        address,
+        updatedAt: serverTimestamp()
+      });
+    } else {
+      const ref = await addDoc(
+        collection(db, "users", currentUser.uid, "addresses"),
+        {
+          label,
+          phone,
+          address,
+          isDefault: false,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        }
+      );
+      addressId = ref.id;
+
+      // Small wait so the real-time listener includes the new address
+      // before the default-address batch runs.
+      addressesById[addressId] = {
+        id: addressId, label, phone, address, isDefault: false
+      };
+    }
+
+    if (makeDefault) {
+      await setDefaultAddress(currentUser.uid, addressId, address);
+    } else if (
+      editingId &&
+      addressesById[editingId]?.isDefault
+    ) {
+      // Keep profile and the edited default address in sync.
+      await updateDoc(doc(db, "users", currentUser.uid), {
+        defaultAddress: address,
+        updatedAt: serverTimestamp()
+      });
+      $("#profileDefaultAddress").value = address;
+    }
+
+    resetAddressForm();
+    toast(editingId ? "Address updated." : "Address saved.", "success");
+  } catch (err) {
+    console.error(err);
+    toast("Couldn't save this address. Please check your network and try again.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+});
+
+/* ---------------- Profile settings ---------------- */
+function syncProfileBusinessField() {
+  $("#profileBizWrap").classList.toggle(
+    "hidden",
+    $("#profileAccountType").value !== "Business"
+  );
+}
+$("#profileAccountType").addEventListener("change", syncProfileBusinessField);
+
+function fillProfileForm(user, profile) {
+  profileFilled = true;
+
+  $("#profileName").value = profile.fullName || user.displayName || "";
+  $("#profilePhone").value = profile.phone || "";
+  $("#profileEmail").value = profile.email || user.email || "";
+  $("#profileAccountType").value = profile.accountType || "Individual";
+  $("#profileBusinessName").value = profile.businessName || "";
+  $("#profileArea").value = profile.area || "";
+  $("#profileDefaultAddress").value = profile.defaultAddress || "";
+
+  const prefs = profile.notificationPrefs || {};
+  $("#profilePrefEmail").checked = prefs.email !== false;
+  $("#profilePrefSms").checked = prefs.sms !== false;
+  $("#profilePrefWhatsapp").checked = prefs.whatsapp !== false;
+
+  syncProfileBusinessField();
+}
+
+$("#profileForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (!currentUser || !db) return;
+
+  $("#profileError").classList.remove("show");
+  $("#profileSuccess").classList.remove("show");
+
+  const data = {
+    fullName: $("#profileName").value.trim(),
+    phone: $("#profilePhone").value.trim(),
+    accountType: $("#profileAccountType").value,
+    businessName: $("#profileBusinessName").value.trim(),
+    area: $("#profileArea").value.trim(),
+    defaultAddress: $("#profileDefaultAddress").value.trim()
+  };
+
+  let ok = true;
+
+  if (data.fullName.length < 3) {
+    setFieldError($("#profileName"), "Please enter your full name.");
+    ok = false;
+  } else setFieldError($("#profileName"), "");
+
+  if (!isValidNgPhone(data.phone)) {
+    setFieldError($("#profilePhone"), "Enter a valid Nigerian phone number.");
+    ok = false;
+  } else setFieldError($("#profilePhone"), "");
+
+  if (data.accountType === "Business" && data.businessName.length < 2) {
+    setFieldError($("#profileBusinessName"), "Please enter your business name.");
+    ok = false;
+  } else setFieldError($("#profileBusinessName"), "");
+
+  if (!ok) {
+    const el = $("#profileError");
+    el.textContent = "Please check the highlighted fields.";
+    el.classList.add("show");
+    return;
+  }
+
+  const btn = $("#profileSaveBtn");
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span> Saving…`;
+
+  try {
+    const updates = {
+      ...data,
+      businessName:
+        data.accountType === "Business" ? data.businessName : "",
+      phoneIntl: normalizeNgPhone(data.phone),
+      notificationPrefs: {
+        email: $("#profilePrefEmail").checked,
+        sms: $("#profilePrefSms").checked,
+        whatsapp: $("#profilePrefWhatsapp").checked
+      },
+      updatedAt: serverTimestamp()
+    };
+
+    await updateDoc(doc(db, "users", currentUser.uid), updates);
+    currentProfile = { ...currentProfile, ...updates };
+    fillHeader(currentUser, currentProfile);
+
+    const success = $("#profileSuccess");
+    success.textContent = "Profile saved successfully.";
+    success.classList.add("show");
+    toast("Profile updated.", "success");
+  } catch (err) {
+    console.error(err);
+    const el = $("#profileError");
+    el.textContent = "Couldn't save your profile. Please check your network and try again.";
+    el.classList.add("show");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+});
+
+/* ---------------- Email verification ---------------- */
+$("#resendVerifyBtn").addEventListener("click", async () => {
+  const btn = $("#resendVerifyBtn");
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span> Sending…`;
+
+  try {
+    await resendVerification();
+    toast("Verification email sent. Please check your inbox and spam folder.", "success");
+  } catch (err) {
+    toast(friendlyAuthError(err), "error");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+});
+
+/* ---------------- Change password ---------------- */
+$("#newPassword").addEventListener("input", e => {
+  const result = getPasswordStrength(e.target.value);
+  $("#newPwBar").style.width = result.width;
+  $("#newPwBar").style.background = result.color;
+  $("#newPwLabel").textContent = result.label;
+});
+
+$("#passwordForm").addEventListener("submit", async e => {
+  e.preventDefault();
+
+  const current = $("#currentPassword").value;
+  const next = $("#newPassword").value;
+  const confirm = $("#confirmNewPassword").value;
+  let ok = true;
+
+  if (!current) {
+    setFieldError($("#currentPassword"), "Enter your current password.");
+    ok = false;
+  } else setFieldError($("#currentPassword"), "");
+
+  if (next.length < 8) {
+    setFieldError($("#newPassword"), "New password must be at least 8 characters.");
+    ok = false;
+  } else setFieldError($("#newPassword"), "");
+
+  if (confirm !== next) {
+    setFieldError($("#confirmNewPassword"), "New passwords do not match.");
+    ok = false;
+  } else setFieldError($("#confirmNewPassword"), "");
+
+  if (!ok) return;
+
+  const btn = $("#passwordSaveBtn");
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span> Updating…`;
+
+  try {
+    await changeUserPassword(current, next);
+    $("#passwordForm").reset();
+    $("#newPwBar").style.width = "0";
+    $("#newPwLabel").textContent = "";
+    toast("Password updated successfully.", "success");
+  } catch (err) {
+    console.error(err);
+    toast(friendlyAuthError(err), "error");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+});
+
+/* ---------------- Logout ---------------- */
+async function logout() {
+  try {
+    await signOutUser();
+    location.href = "index.html";
+  } catch {
+    toast("Couldn't sign out. Please try again.", "error");
+  }
+}
+$("#logoutBtnTop").addEventListener("click", logout);
+$("#logoutBtnBottom").addEventListener("click", logout);
+
+/* ---------------- Delete account ---------------- */
+$("#deleteAccountBtn").addEventListener("click", async () => {
+  const needsPassword =
+    currentUser && hasPasswordProvider(currentUser);
+  const password = needsPassword ? $("#deletePassword").value : "";
+
+  if (needsPassword && !password) {
+    setFieldError(
+      $("#deletePassword"),
+      "Enter your current password before deleting your account."
+    );
+    $("#deletePassword").focus();
+    return;
+  }
+  setFieldError($("#deletePassword"), "");
+
+  const yes = await confirmDialog(
+    "Delete your FL Logistics account?",
+    "This permanently removes your profile and saved addresses. You will no longer be able to sign in with this account. This cannot be undone.",
+    "Yes, delete my account"
+  );
+  if (!yes) return;
+
+  const btn = $("#deleteAccountBtn");
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span> Deleting…`;
+
+  try {
+    await deleteUserAccount(password);
+    sessionStorage.setItem("fl_account_deleted", "1");
+    location.href = "index.html";
+  } catch (err) {
+    console.error(err);
+    toast(friendlyAuthError(err), "error");
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "fl-logistics-functions",
+  "description": "FL Logistics automatic email (Gmail/Nodemailer) and SMS (Termii) order alerts",
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0",
+    "firebase-functions": "^5.1.1",
+    "nodemailer": "^6.9.16"
+  }
+}

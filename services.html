@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Our Services — FL Logistics Lagos</title>
+<meta name="description" content="Same-day, express, interstate, business/e-commerce, bulk multi-drop, document, errand and return delivery services from FL Logistics, Ogba Lagos.">
+<meta name="theme-color" content="#0B3D91">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230B3D91'/><text x='50' y='66' font-size='44' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>FL</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="siteHeader"></div>
+<main>
+<section class="section" style="background:linear-gradient(135deg,var(--blue-dark),var(--blue));color:#fff;padding:44px 0">
+  <div class="container text-center">
+    <span class="kicker" style="background:rgba(255,255,255,.14);color:#ffd9ad">Our Services</span>
+    <h1 style="color:#fff;font-size:2rem">Whatever you're sending, we'll carry it safely</h1>
+    <p style="color:#d7e5ff;max-width:620px;margin:12px auto 0">Pick a service, book in 2 minutes, confirm your final price on WhatsApp, and track your rider live.</p>
+  </div>
+</section>
+
+<section class="section"><div class="container">
+  <div class="grid grid-4" id="servicesGrid"></div>
+</div></section>
+
+<section class="section alt"><div class="container">
+  <div class="section-head reveal"><span class="kicker">Included With Every Delivery</span>
+    <h2>No matter which service you choose</h2></div>
+  <div class="grid grid-4">
+    <div class="card reveal"><div class="icon-badge"><i class="fa-solid fa-receipt"></i></div><h3>Instant Order ID</h3><p class="muted">Track from any phone with one simple code like FLG-4A8K2.</p></div>
+    <div class="card reveal"><div class="icon-badge orange"><i class="fa-solid fa-satellite-dish"></i></div><h3>Live Rider Tracking</h3><p class="muted">Follow your rider on a live map while your parcel is on the move.</p></div>
+    <div class="card reveal"><div class="icon-badge"><i class="fa-solid fa-bell"></i></div><h3>SMS &amp; Email Alerts</h3><p class="muted">Automatic updates for you and your receiver at every stage.</p></div>
+    <div class="card reveal"><div class="icon-badge orange"><i class="fa-solid fa-phone"></i></div><h3>Direct Rider Contact</h3><p class="muted">Call or WhatsApp your rider directly from the tracking page.</p></div>
+  </div>
+  <div class="cta-banner reveal" style="margin-top:30px">
+    <h2>Not sure which service fits?</h2>
+    <p style="margin:8px auto 18px;max-width:500px">Chat with us — tell us what you're sending and where, and we'll recommend the cheapest safe option.</p>
+    <a class="btn btn-blue" id="svcWa" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Ask on WhatsApp</a>
+  </div>
+</div></section>
+</main>
+<div id="siteFooter"></div>
+
+<script type="module">
+import { CONFIG, renderChrome, $, $$, waLink, fmtMoney, esc } from "./app.js";
+renderChrome("services.html");
+$("#svcWa").href = waLink("Hello FL Logistics, I'm not sure which delivery service fits what I want to send. Please advise.");
+
+const U = id => `https://images.unsplash.com/${id}?q=80&w=800&auto=format&fit=crop`;
+/* Each service books with one of the 4 pricing services in CONFIG */
+const services = [
+  { icon:"fa-motorcycle", title:"Same-Day Delivery (Lagos)", book:"Same-day", from:"Same-day",
+    img:U("photo-1526367790999-0150786686a2"), alt:"Courier rider moving through the city for same-day delivery",
+    desc:"Book in the morning, delivered before evening — anywhere within Lagos.",
+    points:["Mainland & Island coverage","Pickup within hours","Best for daily business runs"] },
+  { icon:"fa-bolt", title:"Express Delivery", book:"Express", from:"Express",
+    img:U("photo-1587293852726-70cdb56c2866"), alt:"Parcels ready for urgent express dispatch",
+    desc:"Our fastest option. Priority pickup and straight-to-destination riding in 2–4 hours within Lagos.",
+    points:["Jump-the-queue pickup","Urgent documents & gifts","Direct rider contact"] },
+  { icon:"fa-truck-fast", title:"Interstate Delivery", book:"Interstate", from:"Interstate",
+    img:U("photo-1601584115197-04ecc0da31d7"), alt:"Truck on the highway for interstate delivery across Nigeria",
+    desc:"Safe, tracked delivery from Lagos to Abuja, Port Harcourt, Ibadan, Enugu, Kano and more.",
+    points:["14+ states & cities","Careful long-distance packing advice","Alerts at every stage"] },
+  { icon:"fa-file-lines", title:"Document & Parcel Delivery", book:"Standard", from:"Standard",
+    img:U("photo-1450101499163-c8848c66ca85"), alt:"Signing important documents for delivery",
+    desc:"Contracts, certificates, small parcels and confidential envelopes — handled discreetly and delivered into the right hands.",
+    points:["Sealed & confidential","Proof of delivery updates","From letters to cartons"] },
+  { icon:"fa-store", title:"Business / E-commerce Delivery", book:"Same-day", from:"Same-day",
+    img:U("photo-1441986300917-64674bd600d8"), alt:"Online vendor shop using daily delivery for customers",
+    desc:"Built for online vendors and SMEs: scheduled pickups, customer-friendly riders and cash-on-delivery support.",
+    points:["Daily/routine pickups","Cash-on-delivery support","Grow repeat customers"] },
+  { icon:"fa-route", title:"Bulk & Multi-Drop Delivery", book:"Same-day", from:"Same-day",
+    img:U("photo-1553413077-190dd305871c"), alt:"Warehouse shelves with many parcels for bulk delivery",
+    desc:"Many drop-offs in one booking and one Order ID. Add extra stops in the booking form and save time and money.",
+    points:["Up to 10 stops per order","One tracking link","Great for distribution runs"] },
+  { icon:"fa-bag-shopping", title:"Pickup & Drop-Off Errands", book:"Standard", from:"Standard",
+    img:U("photo-1566576721346-d4a3b4eaeb55"), alt:"Rider handing over a parcel collected on an errand",
+    desc:"Need something collected from a shop, office or home and brought to you? Send us — we queue, collect and deliver.",
+    points:["Market & shop pickups","Office collections","Save your time & fuel"] },
+  { icon:"fa-rotate-left", title:"Return / Reverse Logistics", book:"Standard", from:"Standard",
+    img:U("photo-1587293852726-70cdb56c2866"), alt:"Returned parcels being prepared to go back to the seller",
+    desc:"Wrong size? Customer changed their mind? We collect returns from your customers and bring them safely back to you.",
+    points:["Vendor-friendly returns","Swap/exchange runs","Tracked both ways"] }
+];
+
+$("#servicesGrid").innerHTML = services.map(s => `
+  <article class="lp-svc reveal">
+    <div class="lp-svc-img"><img loading="lazy" src="${s.img}" alt="${esc(s.alt)}">
+      <span class="lp-from">From <b>${fmtMoney(CONFIG.pricing[s.from]?.base || 0)}</b></span></div>
+    <div class="lp-svc-body">
+      <h3><i class="fa-solid ${s.icon}"></i> ${esc(s.title)}</h3>
+      <p class="muted" style="margin-top:8px">${esc(s.desc)}</p>
+      <ul>${s.points.map(p => `<li><i class="fa-solid fa-check"></i>${esc(p)}</li>`).join("")}</ul>
+      <a class="btn btn-ghost btn-block" href="book.html?service=${encodeURIComponent(s.book)}">Book this service</a>
+    </div>
+  </article>`).join("");
+
+/* Image fallback safety net */
+$$("main img").forEach(img => img.addEventListener("error", () => {
+  if (!img.dataset.tried) { img.dataset.tried = 1; img.src = U("photo-1566576721346-d4a3b4eaeb55"); }
+}));
+</script>
+</body>
+</html>
